@@ -23,8 +23,9 @@ export const getproducts = async (req, res) => {
     }
 */
   try {
+    console.log("fetching the Products");
     const products = await Product.find({});
-    res.json(products);
+    res.json({ products: products });
   } catch (err) {
     res.json({ message: err.message });
   }
@@ -32,6 +33,7 @@ export const getproducts = async (req, res) => {
 
 export const addProducts = async (req, res) => {
   try {
+    console.log("adding products");
     const newProduct = await new Product({
       ...req.body,
       quantity: 0,
@@ -44,10 +46,19 @@ export const addProducts = async (req, res) => {
   }
 };
 
-export const getByCategory = async (req, res) => {
+export const getProduct = async (req, res) => {
   try {
-    const category = getCategory(req.params.category);
-    const products = await Product.find({ category: category });
+    console.log("fetching products by category");
+    let prop = req.params.category === "product" ? req.query : req.params;
+    if (
+      prop.category === "mensClothing" ||
+      prop.category === "womensClothing"
+    ) {
+      prop.category = getCategory(prop.category);
+    }
+
+    console.log(prop);
+    const products = await Product.find(prop);
     res.json(products);
   } catch (err) {
     res.json({ message: err.message });
@@ -56,6 +67,7 @@ export const getByCategory = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
+    console.log("removing the product");
     const product = await Product.findOneAndDelete({ _id: req.body._id });
     res.json({ message: "successfully deleted" });
   } catch (err) {
@@ -66,9 +78,11 @@ export const deleteProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   const { _id, action, uniqueId } = req.body;
   try {
+    console.log("updating the product");
     const product = await Product.findOne({ _id: _id });
-    const rating = product.rating
+    const rating = product.rating;
     let updateProps = getUpdateProp(product, action, rating);
+    console.log(updateProps);
     await Product.findOneAndUpdate(
       { _id: _id },
       {
@@ -105,16 +119,6 @@ export const updateProduct = async (req, res) => {
       }
     }
     res.json({ product: updateProps });
-  } catch (err) {
-    res.json({ message: err.message });
-  }
-};
-
-export const getProductById = async (req, res) => {
-  try {
-
-    const product = await Product.findOne({ _id: req.params.productId });
-    res.json({ product: product });
   } catch (err) {
     res.json({ message: err.message });
   }

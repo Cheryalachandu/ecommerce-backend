@@ -37,3 +37,4 @@ export const getUpdateProp = (product, action, rating) => {
     return { wishlist: false };
   }
 };
+

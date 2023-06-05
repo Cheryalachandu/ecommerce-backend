@@ -15,23 +15,23 @@ export const updateCartProduct = async (req, res) => {
   try {
     const { action, uniqueId } = req?.body;
     const cardProduct = await CardProduct.findOne({ uniqueId: uniqueId });
-    console.log(cardProduct)
-    const rating = cardProduct.product.rating;
-    let updateProps = getUpdateProp(cardProduct, action, rating);
-    console.log(updateProps);
-    const propssss = {
-      ...cardProduct,
-      product: {
-        ...cardProduct,
-        rating: updateProps.rating,
-      },
-      quantity: updateProps.quantity,
-    };
-    console.log(propssss);
+    const rating = cardProduct?.product?.rating;
+    let updatedProps = getUpdateProp(cardProduct, action, rating);
     await CardProduct.findOneAndUpdate(
       { uniqueId: uniqueId },
       {
-        $set: propssss,
+        $set: {
+          quantity: updatedProps?.quantity,
+          product: {
+            rating: updatedProps?.rating,
+            uniqueId: cardProduct?.product?.uniqueId,
+            title: cardProduct?.product?.title,
+            price: cardProduct?.product?.price,
+            description: cardProduct?.product?.description,
+            category: cardProduct?.product?.category,
+            image: cardProduct?.product?.image,
+          },
+        },
       }
     );
 
